@@ -1,6 +1,7 @@
 using System;
 using AutoMapper;
-using Domain.Entities;
+using Domain.Entities.Models;
+
 using Shared.DTO;
 
 namespace src;

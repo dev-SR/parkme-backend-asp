@@ -1,6 +1,6 @@
 using System;
 using AutoMapper;
-using Domain.Entities;
+using Domain.Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Services.Contracts;

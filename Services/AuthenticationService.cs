@@ -1,16 +1,16 @@
 using System;
 using AutoMapper;
-using Domain.Entities;
+using Domain.Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Services.Contracts;
-using Shared;
 using Shared.DTO;
 using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
+using Domain.Entities.ConfigurationModels;
 namespace Services;
 
 internal sealed class AuthenticationService : IAuthenticationService
@@ -20,7 +20,7 @@ internal sealed class AuthenticationService : IAuthenticationService
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
     private readonly IConfiguration _configuration;
-
+    private readonly JwtConfiguration _jwtConfiguration;
     private User? _user;
 
     public AuthenticationService(ILoggerManager logger, IMapper mapper, UserManager<User> userManager, IConfiguration configuration)
@@ -29,6 +29,9 @@ internal sealed class AuthenticationService : IAuthenticationService
         _mapper = mapper;
         _userManager = userManager;
         _configuration = configuration;//for accessing appsettings.json [i.e. _configuration["Jwt:Key"]]
+
+        // Populate JwtConfiguration with environment variables
+        _jwtConfiguration = new JwtConfiguration();
     }
 
 
@@ -87,9 +90,8 @@ internal sealed class AuthenticationService : IAuthenticationService
      */
     private SigningCredentials GetSigningCredentials()
     {
-        string? JWT_SECRET = Environment.GetEnvironmentVariable("JWT_SECRET");
 
-        var key = Encoding.UTF8.GetBytes(JWT_SECRET!);
+        var key = Encoding.UTF8.GetBytes(_jwtConfiguration.Secret!);
         var secret = new SymmetricSecurityKey(key);
         return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
     }
@@ -107,17 +109,14 @@ internal sealed class AuthenticationService : IAuthenticationService
     private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
     {
 
-        string? JWT_ISSUER = Environment.GetEnvironmentVariable("JWT_ISSUER");
-        string? JWT_AUDIENCE = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-        string? JWT_EXPIRES = Environment.GetEnvironmentVariable("JWT_EXPIRES");
 
 
         var tokenOptions = new JwtSecurityToken
                                 (
-                                issuer: JWT_ISSUER,
-                                audience: JWT_AUDIENCE,
+                                issuer: _jwtConfiguration.ValidIssuer,
+                                audience: _jwtConfiguration.ValidAudience,
                                 claims: claims,
-                                expires: DateTime.Now.AddMinutes(Convert.ToDouble(JWT_EXPIRES)),
+                                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtConfiguration.Expires)),
                                 signingCredentials: signingCredentials
                                 );
         return tokenOptions;
@@ -133,19 +132,16 @@ allow the refresh token functionality for the expired token as well, set this pr
  */
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
-        string? JWT_SECRET = Environment.GetEnvironmentVariable("JWT_SECRET");
-        string? JWT_ISSUER = Environment.GetEnvironmentVariable("JWT_ISSUER");
-        string? JWT_AUDIENCE = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
 
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = true,
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_SECRET!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.Secret!)),
             ValidateLifetime = true,
-            ValidIssuer = JWT_ISSUER,
-            ValidAudience = JWT_AUDIENCE,
+            ValidIssuer = _jwtConfiguration.ValidIssuer,
+            ValidAudience = _jwtConfiguration.ValidAudience
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
