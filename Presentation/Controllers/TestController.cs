@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
@@ -13,15 +14,22 @@ public class TestController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "logger")]
+    [HttpGet("logger")]
     public IActionResult Get()
     {
-        _logger.LogInfo("Here is info message from our values controller.");
-        _logger.LogDebug("Here is debug message from our values controller.");
-        _logger.LogWarn("Here is warn message from our values controller.");
-        _logger.LogError("Here is an error message from our values controller.");
+        _logger.LogInfo($"{nameof(TestController)} Here is info message from our values controller.");
+        _logger.LogDebug($"{nameof(TestController)} Here is debug message from our values controller.");
+        _logger.LogWarn($"{nameof(TestController)} Here is warn message from our values controller.");
+        _logger.LogError($"{nameof(TestController)} Here is an error message from our values controller.");
 
         return Ok();
+    }
+
+    [HttpGet("protected")]
+    [Authorize]
+    public IActionResult GetProtected()
+    {
+        return Ok("This is an protected endpoint");
     }
 }
 

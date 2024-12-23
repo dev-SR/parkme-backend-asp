@@ -23,6 +23,7 @@ builder.Services.InjectDbContext();
 // enable identity
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
+builder.Services.ConfigureJWT();
 // add logger service
 builder.Services.ConfigureLoggerService();
 // inject services
@@ -33,7 +34,8 @@ builder.Services.ConfigureServiceManager();
 builder.Services.AddControllers()
                 .AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);//new
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// builder.Services.AddOpenApi();
+builder.Services.AddOpenApi("v1", options => { options.AddDocumentTransformer<BearerSecuritySchemeTransformer>(); });
 
 var app = builder.Build();
 
@@ -50,7 +52,6 @@ app.MapScalarApiReference(options =>
     options.WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Axios);
     options.WithModels(false);
     options.OperationSorter = OperationSorter.Method;
-
     //...
 });
 if (app.Environment.IsProduction())
