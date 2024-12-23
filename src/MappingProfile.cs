@@ -1,0 +1,15 @@
+using System;
+using AutoMapper;
+using Domain.Entities;
+using Shared.DTO;
+
+namespace src;
+
+
+public class MappingProfile : Profile
+{
+    public MappingProfile()
+    {
+        CreateMap<UserForRegistrationDto, User>();
+    }
+}

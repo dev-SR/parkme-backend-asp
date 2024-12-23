@@ -1,10 +1,13 @@
 using System;
+using Domain.Entities;
+using Infrastructure.Data.Configuration;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Infrastructure.Data;
 
-public class RepositoryDbContext : DbContext
+public class RepositoryDbContext : IdentityDbContext<User>
 {
     public RepositoryDbContext(DbContextOptions options) : base(options) { }
 
@@ -14,7 +17,8 @@ public class RepositoryDbContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
+        base.OnModelCreating(modelBuilder);// required for identity migration to work properly.
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
     }
 
 }

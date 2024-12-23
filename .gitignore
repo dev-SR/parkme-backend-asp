@@ -485,3 +485,5 @@ $RECYCLE.BIN/
 
 internal_logs
 log
+*.db-shm
+*.db-wal

@@ -3,6 +3,7 @@ using NLog;
 using DotNetEnv;
 using src.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
+using src;
 var builder = WebApplication.CreateBuilder(args);
 // Load environment variables from the .env file
 Env.Load();
@@ -12,12 +13,21 @@ var nLogConfigFilePath = string.Concat(Directory.GetCurrentDirectory(), "\\nlog.
 LogManager.Setup().LoadConfigurationFromFile(nLogConfigFilePath);
 
 // Add services to the container.
-// add logger service
-builder.Services.ConfigureLoggerService();
+
 // enable cors
 builder.Services.ConfigureCors();
+// auto mapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 // enable db context
 builder.Services.InjectDbContext();
+// enable identity
+builder.Services.AddAuthentication();
+builder.Services.ConfigureIdentity();
+// add logger service
+builder.Services.ConfigureLoggerService();
+// inject services
+builder.Services.ConfigureServiceManager();
+
 
 
 builder.Services.AddControllers()
@@ -28,7 +38,7 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 // apply migrations
-// app.ApplyMigrations();
+app.ApplyMigrations();
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment()){ }
@@ -51,8 +61,8 @@ app.UseHttpsRedirection();
 app.UseCors("CorsPolicy");
 app.UseStaticFiles();//new
 app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All });//new
+app.UseAuthentication();//new
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
