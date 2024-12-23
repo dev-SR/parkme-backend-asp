@@ -29,6 +29,9 @@ namespace Infrastructure.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
@@ -66,6 +69,12 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("RefreshTokenExpiryTime")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
@@ -117,13 +126,13 @@ namespace Infrastructure.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0162870b-23b6-4ef7-8e50-1300ef05c4f3",
+                            Id = "e513a23b-ea70-460c-b46a-eff9a5151848",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "828f2111-68ef-44dd-9212-f5013a2ff184",
+                            Id = "27fef753-4275-425c-b63a-0d1889fd0fb4",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

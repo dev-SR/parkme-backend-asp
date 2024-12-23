@@ -34,6 +34,9 @@ namespace Infrastructure.Data.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
+                    RefreshToken = table.Column<string>(type: "TEXT", nullable: true),
+                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -165,8 +168,8 @@ namespace Infrastructure.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0162870b-23b6-4ef7-8e50-1300ef05c4f3", null, "User", "USER" },
-                    { "828f2111-68ef-44dd-9212-f5013a2ff184", null, "Admin", "ADMIN" }
+                    { "27fef753-4275-425c-b63a-0d1889fd0fb4", null, "Admin", "ADMIN" },
+                    { "e513a23b-ea70-460c-b46a-eff9a5151848", null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(
