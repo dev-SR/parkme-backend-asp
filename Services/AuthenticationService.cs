@@ -23,7 +23,6 @@ internal sealed class AuthenticationService : IAuthenticationService
         _userManager = userManager;
     }
 
-
     public async Task<IdentityResult> Register(RegistrationRequestDto registerRequestBody)
     {
         var user = _mapper.Map<User>(registerRequestBody);
@@ -60,5 +59,12 @@ internal sealed class AuthenticationService : IAuthenticationService
     public Task<TokenPairDto> RefreshToken(RefreshTokenRequestDto requestTokenDto)
     {
         return _tokenService.ReGenerateAccessToken(requestTokenDto);
+    }
+
+    public async Task<UserResponseDto> GetCurrentUser(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        var roles = await _userManager.GetRolesAsync(user!);
+        return _mapper.Map<UserResponseDto>((user, roles));
     }
 }

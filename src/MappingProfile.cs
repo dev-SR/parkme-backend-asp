@@ -13,19 +13,11 @@ public class MappingProfile : Profile
 
         // Map (User,roles) to UserResponseDto
         CreateMap<(User user, IList<string> roles), UserResponseDto>()
-        .ForMember(des => des.Roles, opt => opt.MapFrom(src => src.roles))
         .ForMember(des => des.Id, opt => opt.MapFrom(src => src.user.Id))
         .ForMember(des => des.Email, opt => opt.MapFrom(src => src.user.Email))
         .ForMember(des => des.FirstName, opt => opt.MapFrom(src => src.user.FirstName))
-        .ForMember(des => des.LastName, opt => opt.MapFrom(src => src.user.LastName));
-
-        // Map (User,roles) to UserResponseDto
-        CreateMap<(User user, IList<string> roles), UserResponseDto>()
-        .ForMember(des => des.Roles, opt => opt.MapFrom(src => src.roles))
-        .ForMember(des => des.Id, opt => opt.MapFrom(src => src.user.Id))
-        .ForMember(des => des.Email, opt => opt.MapFrom(src => src.user.Email))
-        .ForMember(des => des.FirstName, opt => opt.MapFrom(src => src.user.FirstName))
-        .ForMember(des => des.LastName, opt => opt.MapFrom(src => src.user.LastName));
+        .ForMember(des => des.LastName, opt => opt.MapFrom(src => src.user.LastName))
+        .ForMember(des => des.Roles, opt => opt.MapFrom(src => src.roles));
 
         // Map (UserResponseDto,accessToken,refreshToken) to UserResponseDto
         CreateMap<(UserResponseDto user, string accessToken, string refreshToken), LoginResponseDto>()

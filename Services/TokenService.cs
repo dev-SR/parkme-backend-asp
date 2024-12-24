@@ -84,7 +84,9 @@ public class TokenService : ITokenService
 
     private async Task<List<Claim>> GetClaimsPayLoad(User user)
     {
-        var claims = new List<Claim>{new Claim(ClaimTypes.Email, user.Email!)
+        var claims = new List<Claim>{
+            new Claim(ClaimTypes.Email, user.Email!),
+            new Claim(ClaimTypes.NameIdentifier, user.Id)
     };
         var roles = await _userManager.GetRolesAsync(user);
         foreach (var role in roles)
@@ -102,8 +104,6 @@ public class TokenService : ITokenService
                                     claims: payload,//token payload information
                                     expires: DateTime.Now.AddDays(_jwtConfiguration.AccessTokenExpirationInMinutes),
                                     signingCredentials: signingCredentials//Defines the SecurityKey, algorithm and digest for digital signatures.
-
-
                                 );
     }
 

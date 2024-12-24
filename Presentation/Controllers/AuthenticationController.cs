@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
@@ -41,5 +43,34 @@ public class AuthenticationController : ControllerBase
     {
         var res = await _service.AuthenticationService.Login(user);
         return Ok(res);
+    }
+
+
+    [HttpGet("current-user")]
+    [Authorize]
+    public async Task<ActionResult<UserResponseDto>> CurrentUser()
+    {
+        //More https://stackoverflow.com/questions/38751616/asp-net-core-identity-get-current-user
+        ClaimsPrincipal currentUser = this.User;
+        var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        // bool isAdmin = currentUser.IsInRole("Admin");
+        // bool isUser = currentUser.IsInRole("User");
+        // var email = currentUser.FindFirst(ClaimTypes.Email)?.Value;
+        // var roles = currentUser.FindAll(ClaimTypes.Role).Select(c => c.Value);
+        // return Ok(new
+        // {
+        //     userId,
+        //     email,
+        //     isAdmin,
+        //     isUser,
+        //     roles
+        // });
+        if (userId != null)
+        {
+            return BadRequest("User not found");
+        }
+
+        var user = await _service.AuthenticationService.GetCurrentUser(userId!);
+        return Ok(user);
     }
 }

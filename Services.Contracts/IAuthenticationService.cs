@@ -12,4 +12,6 @@ public interface IAuthenticationService
 
     Task<TokenPairDto> RefreshToken(RefreshTokenRequestDto requestTokenDto);
 
+    Task<UserResponseDto> GetCurrentUser(string userId);
+
 }
