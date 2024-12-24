@@ -10,4 +10,6 @@ public interface IAuthenticationService
     Task<IdentityResult> Register(RegistrationRequestDto registerRequestBody);
     Task<LoginResponseDto> Login(LoginRequestDto loginRequestBody);
 
+    Task<TokenPairDto> RefreshToken(RefreshTokenRequestDto requestTokenDto);
+
 }

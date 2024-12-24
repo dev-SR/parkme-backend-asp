@@ -11,7 +11,9 @@ public class RefreshTokenRepository : RepositoryBase<RefreshToken>, IRefreshToke
 
 
     public async Task<RefreshToken?> GetRefreshTokenByToken(string refreshToken) =>
-        await FindByCondition(r => r.Token.Equals(refreshToken), trackChanges: false).SingleOrDefaultAsync();
+        await FindByCondition(r => r.Token.Equals(refreshToken), trackChanges: false)
+                .Include(r => r.User)
+                .SingleOrDefaultAsync();
 
     public async Task<RefreshToken?> GetRefreshTokenByUser(User user) =>
         await FindByCondition(r => r.UserId.Equals(user.Id), trackChanges: false).SingleOrDefaultAsync();

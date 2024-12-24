@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
 using Shared.DTO;
+using Shared.DTO.Auth;
 
 namespace Presentation.Controllers
 {
@@ -14,11 +15,11 @@ namespace Presentation.Controllers
         public TokenController(IServiceManager service) => _service = service;
 
 
-        // [HttpPost("refresh")]
-        // public async Task<IActionResult> Refresh([FromBody] TokenDto tokenDto)
-        // {
-        //     var tokenDtoToReturn = await _service.AuthenticationService.RefreshToken(tokenDto);
-        //     return Ok(tokenDtoToReturn);
-        // }
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto token)
+        {
+            var tokenDtoToReturn = await _service.AuthenticationService.RefreshToken(token);
+            return Ok(tokenDtoToReturn);
+        }
     }
 }

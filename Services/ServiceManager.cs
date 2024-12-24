@@ -16,7 +16,7 @@ public sealed class ServiceManager : IServiceManager
     public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper, UserManager<User> userManager, IConfiguration configuration)
     {
 
-        _tokenService = new Lazy<ITokenService>(() => new TokenService(repositoryManager, userManager));
+        _tokenService = new Lazy<ITokenService>(() => new TokenService(repositoryManager, userManager, logger));
         _authenticationService = new Lazy<IAuthenticationService>(() =>
                         new AuthenticationService(repositoryManager, logger, mapper, userManager, _tokenService.Value));
     }

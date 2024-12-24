@@ -4,11 +4,13 @@ using System.Text;
 using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities.ConfigurationModels;
+using Domain.Entities.Exceptions;
 using Domain.Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Services.Contracts;
+using Shared.DTO.Auth;
 
 namespace Services;
 
@@ -16,10 +18,11 @@ public class TokenService : ITokenService
 {
     private readonly UserManager<User> _userManager;
     private readonly JwtConfiguration _jwtConfiguration;
-
     private readonly IRepositoryManager _repository;
-    public TokenService(IRepositoryManager repository, UserManager<User> userManager)
+    private readonly ILoggerManager _logger;
+    public TokenService(IRepositoryManager repository, UserManager<User> userManager, ILoggerManager logger)
     {
+        _logger = logger;
         _repository = repository;
         _userManager = userManager;
         _jwtConfiguration = new JwtConfiguration();
@@ -44,7 +47,6 @@ public class TokenService : ITokenService
         }
         string token = Guid.NewGuid().ToString().Replace("-", "");
 
-
         var refreshTokenEntity = new RefreshToken
         {
             Token = token,
@@ -56,6 +58,24 @@ public class TokenService : ITokenService
 
         return token;
     }
+
+
+    public async Task<TokenPairDto> ReGenerateAccessToken(RefreshTokenRequestDto requestTokenDto)
+    {
+        var refreshToken = await _repository.RefreshToken.GetRefreshTokenByToken(requestTokenDto.refreshToken);
+        if (refreshToken == null || refreshToken.ExpiryDate < DateTime.Now)
+        {
+            throw new RefreshTokenBadRequest();
+        }
+        // _logger.LogInfo($"Refreshing token for user: {refreshToken.User.Id}");
+
+        var newAccessToken = await GenerateAccessToken(refreshToken.User);
+        var newRefreshToken = await GenerateAndSaveRefreshToken(refreshToken.User);
+        return new TokenPairDto(newAccessToken, newRefreshToken);
+    }
+
+
+
     private SigningCredentials GetSigningCredentials()
     {
 
@@ -88,5 +108,6 @@ public class TokenService : ITokenService
 
                                 );
     }
+
 
 }
