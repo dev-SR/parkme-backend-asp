@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
-using Shared.DTO;
 using Shared.DTO.Auth;
 
 namespace Presentation.Controllers

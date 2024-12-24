@@ -1,4 +1,3 @@
-using System;
 using Domain.Contracts;
 using Domain.Entities.Models;
 using Microsoft.EntityFrameworkCore;

@@ -1,17 +1,7 @@
-using System;
 using AutoMapper;
 using Domain.Entities.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Services.Contracts;
-using Shared.DTO;
-using System.Text;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
-using Domain.Entities.ConfigurationModels;
-using Domain.Entities.Exceptions;
 using Shared.DTO.Auth;
 using Domain.Contracts;
 namespace Services;
