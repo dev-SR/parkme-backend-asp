@@ -49,11 +49,9 @@ internal sealed class AuthenticationService : IAuthenticationService
     public async Task<LoginResponseDto> Login(LoginRequestDto loginRequestBody)
     {
         var user = await _userManager.FindByEmailAsync(loginRequestBody.Email);
-        _logger.LogInfo($" User with email: {loginRequestBody.Email} attempted to log in.");
 
         var passwordValid = await _userManager.CheckPasswordAsync(user!, loginRequestBody.Password!);
 
-        _logger.LogInfo($" User with email: {passwordValid}");
         if (user == null || !passwordValid)
         {
             throw new UnauthorizedAccessException("Invalid Credentials");

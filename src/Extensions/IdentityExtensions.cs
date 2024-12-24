@@ -10,9 +10,10 @@ namespace src.Extensions;
 
 public static class IdentityExtensions
 {
-    public static void ConfigureIdentity(this IServiceCollection services)
+
+    public static IServiceCollection AddIdentityHandlersAndStores(this IServiceCollection services)
     {
-        var builder = services.AddIdentity<User, IdentityRole>(o =>
+        services.AddIdentity<User, IdentityRole>(o =>
         {
             o.Password.RequireDigit = true;
             o.Password.RequireLowercase = false;
@@ -23,9 +24,11 @@ public static class IdentityExtensions
         })
         .AddEntityFrameworkStores<RepositoryDbContext>()
         .AddDefaultTokenProviders();
+
+        return services;
     }
 
-    public static void ConfigureJWT(this IServiceCollection services)
+    public static IServiceCollection AddIdentityAuth(this IServiceCollection services)
     {
 
         string? JWT_ISSUER = Environment.GetEnvironmentVariable("JWT_ISSUER");
@@ -41,7 +44,8 @@ public static class IdentityExtensions
         {
             opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
+        })
+        .AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -52,5 +56,17 @@ public static class IdentityExtensions
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_SECRET!))
             };
         });
+
+        services.AddAuthorization();
+
+        return services;
     }
+
+    public static WebApplication AddIdentityAuthMiddlewares(this WebApplication app)
+    {
+        app.UseAuthentication();//MUST BE BEFORE AUTHORIZATION
+        app.UseAuthorization();
+        return app;
+    }
+
 }

@@ -9,34 +9,32 @@ using Microsoft.AspNetCore.Mvc;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Load environment variables from the .env file
 Env.Load();
-
 // Set up NLog
 var nLogConfigFilePath = string.Concat(Directory.GetCurrentDirectory(), "\\nlog.config");
 LogManager.Setup().LoadConfigurationFromFile(nLogConfigFilePath);
 
 // Add services to the container.
-
 // enable cors
 builder.Services.ConfigureCors();
 // auto mapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 // enable db context
 builder.Services.InjectDbContext();
-// enable identity
-builder.Services.AddAuthentication();
-builder.Services.ConfigureIdentity();
-builder.Services.ConfigureJWT();
 // add logger service
 builder.Services.ConfigureLoggerService();
+
+// enable identity auth
+builder.Services.AddIdentityHandlersAndStores()
+                .AddIdentityAuth();
+
 // handle global exception
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // inject services
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
-
-
 
 builder.Services.AddControllers()
                 .AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly)
@@ -94,8 +92,7 @@ app.UseCors("CorsPolicy");
 app.UseExceptionHandler(opt => { });
 app.UseStaticFiles();//new
 app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All });//new
-app.UseAuthentication();//new; must be before authorization
-app.UseAuthorization();
+app.AddIdentityAuthMiddlewares();//NEW
 app.MapControllers();
 
 app.Run();
