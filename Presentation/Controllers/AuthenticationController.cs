@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
 using Shared;
 using Shared.DTO;
+using Shared.DTO.Auth;
 
 namespace Presentation.Controllers;
 
@@ -20,9 +21,9 @@ public class AuthenticationController : ControllerBase
 
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
+    public async Task<IActionResult> RegisterUser([FromBody] RegistrationRequestDto userForRegistration)
     {
-        var result = await _service.AuthenticationService.RegisterUser(userForRegistration);
+        var result = await _service.AuthenticationService.Register(userForRegistration);
         if (!result.Succeeded)
         {
             foreach (var error in result.Errors)
@@ -36,13 +37,9 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Authenticate([FromBody] UserForLoginDto user)
+    public async Task<ActionResult<LoginResponseDto>> Authenticate([FromBody] LoginRequestDto user)
     {
-        if (!await _service.AuthenticationService.ValidateUser(user))
-            return Unauthorized(
-                new { Message = "Wrong email or password." }
-            );
-        var tokenDto = await _service.AuthenticationService.CreateToken(populateExp: true);
-        return Ok(tokenDto);
+        var res = await _service.AuthenticationService.Login(user);
+        return Ok(res);
     }
 }

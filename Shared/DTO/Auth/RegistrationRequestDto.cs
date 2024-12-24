@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Shared.DTO;
+namespace Shared.DTO.Auth;
 
-public record UserForRegistrationDto
+public record RegistrationRequestDto
 {
     [Required(ErrorMessage = "First Name is required")]
     public required string FirstName { get; init; }

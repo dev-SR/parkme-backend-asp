@@ -1,13 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Identity;
 using Shared;
-using Shared.DTO;
+using Shared.DTO.Auth;
 
 namespace Services.Contracts;
 
 public interface IAuthenticationService
 {
-    Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistration);
-    Task<bool> ValidateUser(UserForLoginDto userForLogin);
-    Task<TokenDto> CreateToken(bool populateExp);
+    Task<IdentityResult> Register(RegistrationRequestDto registerRequestBody);
+    Task<LoginResponseDto> Login(LoginRequestDto loginRequestBody);
+
 }

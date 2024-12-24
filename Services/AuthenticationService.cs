@@ -11,6 +11,9 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using Domain.Entities.ConfigurationModels;
+using Domain.Entities.Exceptions;
+using Shared.DTO.Auth;
+using Domain.Contracts;
 namespace Services;
 
 internal sealed class AuthenticationService : IAuthenticationService
@@ -19,143 +22,51 @@ internal sealed class AuthenticationService : IAuthenticationService
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
-    private readonly IConfiguration _configuration;
-    private readonly JwtConfiguration _jwtConfiguration;
-    private User? _user;
-
-    public AuthenticationService(ILoggerManager logger, IMapper mapper, UserManager<User> userManager, IConfiguration configuration)
+    private readonly ITokenService _tokenService;
+    private readonly IRepositoryManager _repository;
+    public AuthenticationService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, UserManager<User> userManager, ITokenService tokenService)
     {
+        _repository = repository;
+        _tokenService = tokenService;
         _logger = logger;
         _mapper = mapper;
         _userManager = userManager;
-        _configuration = configuration;//for accessing appsettings.json [i.e. _configuration["Jwt:Key"]]
-
-        // Populate JwtConfiguration with environment variables
-        _jwtConfiguration = new JwtConfiguration();
     }
 
 
-    public async Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistration)
+    public async Task<IdentityResult> Register(RegistrationRequestDto registerRequestBody)
     {
-        var user = _mapper.Map<User>(userForRegistration);
-        user.UserName = userForRegistration.Email; //email is used as username
+        var user = _mapper.Map<User>(registerRequestBody);
+        user.UserName = registerRequestBody.Email; //UserName is required in Identity;email is used as username;
 
-        var result = await _userManager.CreateAsync(user, userForRegistration.Password!);
+        var result = await _userManager.CreateAsync(user, registerRequestBody.Password!);
 
         if (result.Succeeded)
             await _userManager.AddToRolesAsync(user, ["User"]);
         return result;
     }
 
-    public async Task<bool> ValidateUser(UserForLoginDto userForLogin)
+    public async Task<LoginResponseDto> Login(LoginRequestDto loginRequestBody)
     {
-        _user = await _userManager.FindByNameAsync(userForLogin.Email);
-        var result = _user != null && await _userManager.CheckPasswordAsync(_user, userForLogin.Password);
-        if (!result)
-            _logger.LogWarn($"{nameof(ValidateUser)}: Authentication failed. Wrong email or password.");
-        return result;
-    }
-    public async Task<TokenDto> CreateToken(bool populateExp)
-    {
-        var signingCredentials = GetSigningCredentials();
-        var claims = await GetClaims();
-        var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
+        var user = await _userManager.FindByEmailAsync(loginRequestBody.Email);
+        _logger.LogInfo($" User with email: {loginRequestBody.Email} attempted to log in.");
 
-        var refreshToken = GenerateRefreshToken();
+        var passwordValid = await _userManager.CheckPasswordAsync(user!, loginRequestBody.Password!);
 
-        _user!.RefreshToken = refreshToken;
-
-        if (populateExp)
-            _user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
-
-        await _userManager.UpdateAsync(_user);
-
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-
-        return new TokenDto(accessToken, refreshToken);
-    }
-
-    private string GenerateRefreshToken()
-    {
-        var randomNumber = new byte[32];
-        using (var rng = RandomNumberGenerator.Create())
+        _logger.LogInfo($" User with email: {passwordValid}");
+        if (user == null || !passwordValid)
         {
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
+            throw new UnauthorizedAccessException("Invalid Credentials");
         }
+        // Get the user's roles
+        var roles = await _userManager.GetRolesAsync(user);
+
+        string AccessToken = await _tokenService.GenerateAccessToken(user);
+        string RefreshToken = await _tokenService.GenerateAndSaveRefreshToken(user);
+
+        UserResponseDto userRes = _mapper.Map<UserResponseDto>((user, roles));
+        LoginResponseDto response = _mapper.Map<LoginResponseDto>((userRes, AccessToken, RefreshToken));
+        return response;
     }
 
-    /* 
-    GetSigningCredentials is used to get the signing credentials for the token. We are using the HMACSHA256 algorithm for the token.
-     */
-    private SigningCredentials GetSigningCredentials()
-    {
-
-        var key = Encoding.UTF8.GetBytes(_jwtConfiguration.Secret!);
-        var secret = new SymmetricSecurityKey(key);
-        return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-    }
-    private async Task<List<Claim>> GetClaims()
-    {
-        var claims = new List<Claim>{new Claim(ClaimTypes.Name, _user!.UserName!)
-    };
-        var roles = await _userManager.GetRolesAsync(_user);
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
-        return claims;
-    }
-    private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
-    {
-
-
-
-        var tokenOptions = new JwtSecurityToken
-                                (
-                                issuer: _jwtConfiguration.ValidIssuer,
-                                audience: _jwtConfiguration.ValidAudience,
-                                claims: claims,
-                                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtConfiguration.Expires)),
-                                signingCredentials: signingCredentials
-                                );
-        return tokenOptions;
-    }
-
-
-
-    /* GetPrincipalFromExpiredToken is used to get the user principal from from the JwtSecurityTokenHandler class for this purpose.  principal is the user object that we will use to generate the new token.
-
-Also, you can see the ValidateLifetime property set to `true`. sometimes in our client app, we want to refresh the token before it expires, and that’s what we forced here in our API. But if you want to
-allow the refresh token functionality for the expired token as well, set this property to false.
-
- */
-    private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-    {
-
-        var tokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidateIssuer = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.Secret!)),
-            ValidateLifetime = true,
-            ValidIssuer = _jwtConfiguration.ValidIssuer,
-            ValidAudience = _jwtConfiguration.ValidAudience
-        };
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-
-        SecurityToken securityToken;
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-
-        var jwtSecurityToken = securityToken as JwtSecurityToken;
-        if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
-            StringComparison.InvariantCultureIgnoreCase))
-        {
-            throw new SecurityTokenException("Invalid token");
-        }
-
-        return principal;
-    }
 }
