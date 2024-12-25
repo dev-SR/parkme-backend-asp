@@ -1,21 +1,18 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
-using Shared;
-using Shared.DTO;
 using Shared.DTO.Auth;
 
 namespace Presentation.Controllers;
 
 [Route("api/auth")]
 [ApiController]
-public class AuthenticationController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly IServiceManager _service;
     private readonly ILoggerManager _logger;
-    public AuthenticationController(IServiceManager service, ILoggerManager logger)
+    public AuthController(IServiceManager service, ILoggerManager logger)
     {
         _service = service;
         _logger = logger;
@@ -65,11 +62,6 @@ public class AuthenticationController : ControllerBase
         //     isUser,
         //     roles
         // });
-        if (userId != null)
-        {
-            return BadRequest("User not found");
-        }
-
         var user = await _service.AuthenticationService.GetCurrentUser(userId!);
         return Ok(user);
     }

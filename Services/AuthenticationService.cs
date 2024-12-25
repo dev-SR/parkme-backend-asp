@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Services.Contracts;
 using Shared.DTO.Auth;
 using Domain.Contracts;
+using Domain.Entities.Exceptions;
 namespace Services;
 
 internal sealed class AuthenticationService : IAuthenticationService
@@ -63,7 +64,7 @@ internal sealed class AuthenticationService : IAuthenticationService
 
     public async Task<UserResponseDto> GetCurrentUser(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId) ?? throw new UserNotFoundException(userId);
         var roles = await _userManager.GetRolesAsync(user!);
         return _mapper.Map<UserResponseDto>((user, roles));
     }
