@@ -53,7 +53,8 @@ public static class IdentityExtensions
                 ValidateAudience = false,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_SECRET!))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_SECRET!)),
+                ClockSkew = TimeSpan.Zero//remove default delay of 5 minutes as its add 5 minutes extra time (x+5min)
             };
         });
 

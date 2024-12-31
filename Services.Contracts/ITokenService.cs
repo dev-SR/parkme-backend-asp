@@ -10,5 +10,6 @@ public interface ITokenService
 
     Task<string> GenerateAccessToken(User user);
     Task<string> GenerateAndSaveRefreshToken(User user);
-    Task<TokenPairDto> ReGenerateAccessToken(RefreshTokenRequestDto requestTokenDto);
+    Task<AccessTokenDto> ReGenerateAccessToken(RefreshTokenRequestDto requestTokenDto);
+    Task<TokenPairDto> ReGenerateAccessAndRefreshToken(RefreshTokenRequestDto requestTokenDto);
 }

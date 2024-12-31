@@ -85,6 +85,9 @@ app.MapScalarApiReference(options =>
 if (app.Environment.IsProduction())
     app.UseHsts();
 
+if (app.Environment.IsDevelopment())
+    app.UseMiddleware<AuthorizationHeaderMiddleware>();
+
 app.UseHttpsRedirection();
 // use custom cors middleware
 app.UseCors("CorsPolicy");
@@ -94,5 +97,6 @@ app.UseStaticFiles();//new
 app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All });//new
 app.AddIdentityAuthMiddlewares();//NEW
 app.MapControllers();
+
 
 app.Run();

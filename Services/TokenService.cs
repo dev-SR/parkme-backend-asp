@@ -58,7 +58,22 @@ public class TokenService : ITokenService
     }
 
 
-    public async Task<TokenPairDto> ReGenerateAccessToken(RefreshTokenRequestDto requestTokenDto)
+    public async Task<AccessTokenDto> ReGenerateAccessToken(RefreshTokenRequestDto requestTokenDto)
+    {
+        var refreshToken = await _repository.RefreshToken.GetRefreshTokenByToken(requestTokenDto.refreshToken);
+        if (refreshToken == null || refreshToken.ExpiryDate < DateTime.Now)
+        {
+            throw new RefreshTokenBadRequest();
+        }
+        // _logger.LogInfo($"Refreshing token for user: {refreshToken.User.Id}");
+
+        var newAccessToken = await GenerateAccessToken(refreshToken.User);
+
+        return new AccessTokenDto(newAccessToken);
+    }
+
+
+    public async Task<TokenPairDto> ReGenerateAccessAndRefreshToken(RefreshTokenRequestDto requestTokenDto)
     {
         var refreshToken = await _repository.RefreshToken.GetRefreshTokenByToken(requestTokenDto.refreshToken);
         if (refreshToken == null || refreshToken.ExpiryDate < DateTime.Now)
@@ -71,8 +86,6 @@ public class TokenService : ITokenService
         var newRefreshToken = await GenerateAndSaveRefreshToken(refreshToken.User);
         return new TokenPairDto(newAccessToken, newRefreshToken);
     }
-
-
 
     private SigningCredentials GetSigningCredentials()
     {
@@ -98,12 +111,14 @@ public class TokenService : ITokenService
 
     private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> payload)
     {
+        var expiresAt = _jwtConfiguration.AccessTokenExpirationInMinutes;
+        _logger.LogInfo($"Access token expires in {expiresAt} minutes.");
         return new JwtSecurityToken(
                                     issuer: null,
                                     audience: null,
                                     claims: payload,//token payload information
-                                    expires: DateTime.Now.AddDays(_jwtConfiguration.AccessTokenExpirationInMinutes),
-                                    signingCredentials: signingCredentials//Defines the SecurityKey, algorithm and digest for digital signatures.
+                                    expires: DateTime.Now.AddMinutes(expiresAt),
+                                    signingCredentials: signingCredentials//Defines the SecurityKey, algorithm and digest for digital signatures.,
                                 );
     }
 

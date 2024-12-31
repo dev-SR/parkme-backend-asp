@@ -23,4 +23,5 @@ public sealed class ServiceManager : IServiceManager
 
     public IAuthenticationService AuthenticationService => _authenticationService.Value;
 
+    public ITokenService TokenService => _tokenService.Value;
 }

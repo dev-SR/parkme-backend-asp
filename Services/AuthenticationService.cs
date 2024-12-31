@@ -57,10 +57,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         return response;
     }
 
-    public Task<TokenPairDto> RefreshToken(RefreshTokenRequestDto requestTokenDto)
-    {
-        return _tokenService.ReGenerateAccessToken(requestTokenDto);
-    }
+
 
     public async Task<UserResponseDto> GetCurrentUser(string userId)
     {

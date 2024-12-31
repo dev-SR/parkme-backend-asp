@@ -16,7 +16,7 @@ namespace Presentation.Controllers
         [HttpPost("refresh-token")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto token)
         {
-            var tokenDtoToReturn = await _service.AuthenticationService.RefreshToken(token);
+            var tokenDtoToReturn = await _service.TokenService.ReGenerateAccessToken(token);
             return Ok(tokenDtoToReturn);
         }
     }
