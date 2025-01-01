@@ -1,7 +1,6 @@
-using System;
 using Domain.Entities.Models;
 using Infrastructure.Data.Configuration;
-using Microsoft.AspNetCore.Identity;
+using Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -19,8 +18,16 @@ public class RepositoryDbContext(DbContextOptions options) : IdentityDbContext<U
         base.OnModelCreating(modelBuilder);// required for identity migration to work properly.
         modelBuilder.ApplyConfiguration(new RoleConfiguration());
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+
+        double[] boundingBox = { 89.095284, 23.882667, 89.160215, 23.910604 };
+        var (parkingLots, parkingSpaces) = SeedParking.GenerateSeedData(10, 5, boundingBox);
+        modelBuilder.Entity<ParkingLot>().HasData(parkingLots);
+        modelBuilder.Entity<ParkingSpace>().HasData(parkingSpaces);
+
     }
 
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
+    public required DbSet<ParkingLot> ParkingLots { get; set; }
+    public required DbSet<ParkingSpace> ParkingSpaces { get; set; }
 
 }
