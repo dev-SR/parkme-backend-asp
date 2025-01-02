@@ -1,6 +1,7 @@
 using AutoMapper;
 using Domain.Entities.Models;
 using Shared.DTO.Auth;
+using Shared.DTO.Parking;
 
 namespace src;
 
@@ -25,5 +26,10 @@ public class MappingProfile : Profile
         .ForMember(dest => dest.RefreshToken, opt => opt.MapFrom(src => src.refreshToken))
         .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.user));
 
+
+        CreateMap<ParkingSpace, ParkingSpaceDto>()
+        .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => src.VehicleType.ToString()));
+
+        CreateMap<ParkingLot, ParkingLotDto>();
     }
 }
