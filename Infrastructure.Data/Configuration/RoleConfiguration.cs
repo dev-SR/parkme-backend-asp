@@ -1,22 +1,24 @@
 using System;
-using Microsoft.AspNetCore.Identity;
+using Domain.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Configuration;
 
-public class RoleConfiguration : IEntityTypeConfiguration<IdentityRole>
+public class RoleConfiguration : IEntityTypeConfiguration<MyRole>
 {
-    public void Configure(EntityTypeBuilder<IdentityRole> builder)
+    public void Configure(EntityTypeBuilder<MyRole> builder)
     {
         builder.HasData(
-            new IdentityRole
+            new MyRole
             {
+                Id = Guid.NewGuid(),
                 Name = "User",
                 NormalizedName = "USER"
             },
-            new IdentityRole
+            new MyRole
             {
+                Id = Guid.NewGuid(),
                 Name = "Admin",
                 NormalizedName = "ADMIN"
             }

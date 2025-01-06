@@ -6,14 +6,5 @@ public record ParkingLotDto(
     string Description,
     string Address,
     double Latitude,
-    double Longitude,
-    List<ParkingSpaceDto> ParkingSpaces
-);
-
-public record ParkingSpaceDto(
-    Guid Id,
-    string SectionName,
-    string VehicleType,
-    int PricePerHour,
-    int Capacity
+    double Longitude
 );

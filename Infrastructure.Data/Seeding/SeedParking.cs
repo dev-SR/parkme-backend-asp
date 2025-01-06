@@ -1,6 +1,6 @@
 using Bogus;
 using Domain.Entities.Models;
-using Shared.DTO.Parking;
+using Shared.Enums;
 
 namespace Infrastructure.Data.Seeding;
 
@@ -15,7 +15,7 @@ public record BoundingBox(double swLng, double swLat, double neLng, double neLat
 //
 public class SeedParking
 {
-    public static (IEnumerable<ParkingLot>, IEnumerable<ParkingSpace>) GenerateSeedData(int count, int spacesPerParking, BoundingBox boundingBox)
+    public static (IEnumerable<ParkingLot>, IEnumerable<ParkingSpace>) GenerateSeedData(int count, int parkingSpotsCount, BoundingBox boundingBox)
     {
 
         var parkingLotFaker = new Faker<ParkingLot>()
@@ -26,18 +26,65 @@ public class SeedParking
             .RuleFor(p => p.Longitude, f => f.Random.Double(boundingBox.swLng, boundingBox.neLng))
             .RuleFor(p => p.Latitude, f => f.Random.Double(boundingBox.swLat, boundingBox.neLat));
 
-        var parkingLots = parkingLotFaker.Generate(count);
+        List<ParkingLot> parkingLots = parkingLotFaker.Generate(count);
 
-        var parkingSpaceFaker = new Faker<ParkingSpace>()
-            .RuleFor(s => s.Id, f => Guid.NewGuid())
-            .RuleFor(s => s.SectionName, f => $"{f.PickRandom(new[] { "A", "B", "C", "D" })}-{f.Random.Int(1, 20)}")
-            .RuleFor(s => s.VehicleType, f => f.PickRandom<VehicleType>())
-            .RuleFor(s => s.Capacity, f => f.Random.Int(10, 50))
-            .RuleFor(s => s.PricePerHour, f => f.PickRandom(new[] { 100, 150, 200, 300, 500 }))
-            .RuleFor(s => s.ParkingLotId, f => f.PickRandom(parkingLots).Id);
+        string[] parkingSections = ["A", "B"];
+        int[] parkingSpotsNo = Enumerable.Range(1, parkingSpotsCount).ToArray();
+        List<ParkingSpace> parkingSpaces = []; // Initialize the list outside the loop>
 
-        var parkingSpaces = parkingSpaceFaker.Generate(count * spacesPerParking); // Customizable spaces per parking lot
+        foreach (var lot in parkingLots)
+        {
+            foreach (var SectionName in parkingSections)
+            {
+                var randomVehicleType = new Faker().PickRandom<VehicleType>();
+                int PricePerHour = 100;
+                switch (randomVehicleType)
+                {
+                    case VehicleType.MOTORCYCLE:
+                        PricePerHour = 50;
+                        break;
+                    case VehicleType.CAR:
+                        PricePerHour = 100;
+                        break;
+                    case VehicleType.VAN:
+                        PricePerHour = 200;
+                        break;
+                    case VehicleType.TRUCK:
+                        PricePerHour = 300;
+                        break;
+                }
 
+
+                foreach (var SpotNumber in parkingSpotsNo)
+                {
+                    var parkingSpaceGenerator = new Faker<ParkingSpace>()
+                        .RuleFor(s => s.Id, f => Guid.NewGuid())
+                        .RuleFor(s => s.SectionName, f => SectionName)
+                        .RuleFor(s => s.SpotNumber, f => SpotNumber)
+                        .RuleFor(s => s.VehicleType, f => randomVehicleType)
+                        .RuleFor(s => s.PricePerHour, f => PricePerHour)
+                        .RuleFor(s => s.ParkingLotId, f => lot.Id);
+                    parkingSpaces.Add(parkingSpaceGenerator.Generate());
+                }
+
+            }
+        }
         return (parkingLots, parkingSpaces);
     }
 }
+/* 
+{
+  "bounds": {
+    "swLng": 89.095284,
+    "swLat": 23.882667,
+    "neLng": 89.160215,
+    "neLat": 23.910604
+  },
+  "vehicleTypes": [
+    "CAR"
+  ],
+  "pricePerHourRange": [
+    100,500
+  ]
+}
+*/

@@ -10,10 +10,10 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<RegistrationRequestDto, User>();
+        CreateMap<RegistrationRequestDto, MyUser>();
 
         // Map (User,roles) to UserResponseDto
-        CreateMap<(User user, IList<string> roles), UserResponseDto>()
+        CreateMap<(MyUser user, IList<string> roles), UserResponseDto>()
         .ForMember(des => des.Id, opt => opt.MapFrom(src => src.user.Id))
         .ForMember(des => des.Email, opt => opt.MapFrom(src => src.user.Email))
         .ForMember(des => des.FirstName, opt => opt.MapFrom(src => src.user.FirstName))
@@ -27,8 +27,8 @@ public class MappingProfile : Profile
         .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.user));
 
 
-        CreateMap<ParkingSpace, ParkingSpaceDto>()
-        .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => src.VehicleType.ToString()));
+        // CreateMap<ParkingSpace, ParkingSpaceDto>()
+        // .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => src.VehicleType.ToString()));
 
         CreateMap<ParkingLot, ParkingLotDto>();
     }

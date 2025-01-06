@@ -12,6 +12,7 @@ internal sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refre
         builder.HasKey(rt => rt.Token);
         builder.HasOne(rt => rt.User)
             .WithOne(u => u.RefreshToken)
-            .HasForeignKey<RefreshToken>(rt => rt.UserId).IsRequired();
+            .HasForeignKey<RefreshToken>(rt => rt.UserId)
+            .IsRequired();
     }
 }

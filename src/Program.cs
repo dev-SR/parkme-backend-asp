@@ -50,6 +50,7 @@ builder.Services.AddControllers()
                                 kvp => kvp.Key,
                                 kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToList() ?? new List<string>()
                             );
+                        Console.WriteLine(">>>", errors);
 
                         var errorDetails = new ErrorDetails
                         {

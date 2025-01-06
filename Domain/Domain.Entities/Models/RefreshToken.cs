@@ -6,7 +6,7 @@ public class RefreshToken
     public bool IsRevoked { get; set; } = false; // Revocation status
     public DateTime CreationDate { get; set; } = DateTime.UtcNow;
     public bool IsExpired => DateTime.UtcNow >= ExpiryDate; // Expiry check
-    public required string UserId { get; set; }
-    public virtual User User { get; set; } = null!; //null-forgiving
+    public required Guid UserId { get; set; }
+    public virtual MyUser User { get; set; } = null!; //null-forgiving
 
 }

@@ -7,7 +7,7 @@ public interface IRefreshTokenRepository
 {
 
     Task<RefreshToken?> GetRefreshTokenByToken(string refreshToken);
-    Task<RefreshToken?> GetRefreshTokenByUser(User user);
+    Task<RefreshToken?> GetRefreshTokenByUser(MyUser user);
 
     void SaveRefreshToken(RefreshToken refreshToken);
     void DeleteRefreshToken(RefreshToken refreshToken);

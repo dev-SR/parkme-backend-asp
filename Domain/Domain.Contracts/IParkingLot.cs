@@ -5,6 +5,7 @@ namespace Domain.Contracts;
 
 public interface IParkingLotRepository
 {
-    Task<IEnumerable<ParkingLot>> GetParkingLotsWithinBoundingBox(ParkingLotSearchFormDto searchFormData);
+    Task<IEnumerable<ParkingLot>> GetParkingLotsWithinBoundingBox(ParkingLotFilterFormDto searchFormData);
+
 
 }

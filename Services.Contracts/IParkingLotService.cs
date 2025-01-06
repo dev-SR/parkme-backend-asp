@@ -5,5 +5,5 @@ namespace Services.Contracts;
 
 public interface IParkingLotService
 {
-    Task<IEnumerable<ParkingLotDto>> GetParkingLotsWithinBoundingBox(ParkingLotSearchFormDto searchFormData);
+    Task<IEnumerable<ParkingLotDto>> GetParkingLotsWithinBoundingBox(ParkingLotFilterFormDto filterFormData);
 }

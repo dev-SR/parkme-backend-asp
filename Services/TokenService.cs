@@ -14,11 +14,11 @@ namespace Services;
 
 public class TokenService : ITokenService
 {
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<MyUser> _userManager;
     private readonly JwtConfiguration _jwtConfiguration;
     private readonly IRepositoryManager _repository;
     private readonly ILoggerManager _logger;
-    public TokenService(IRepositoryManager repository, UserManager<User> userManager, ILoggerManager logger)
+    public TokenService(IRepositoryManager repository, UserManager<MyUser> userManager, ILoggerManager logger)
     {
         _logger = logger;
         _repository = repository;
@@ -27,7 +27,7 @@ public class TokenService : ITokenService
 
     }
 
-    public async Task<string> GenerateAccessToken(User user)
+    public async Task<string> GenerateAccessToken(MyUser user)
     {
         var signingCredentials = GetSigningCredentials();
         var payload = await GetClaimsPayLoad(user);
@@ -35,7 +35,7 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
     }
 
-    public async Task<string> GenerateAndSaveRefreshToken(User user)
+    public async Task<string> GenerateAndSaveRefreshToken(MyUser user)
     {
         RefreshToken? existingRefreshToken = await _repository.RefreshToken.GetRefreshTokenByUser(user);
         if (existingRefreshToken != null)
@@ -65,7 +65,7 @@ public class TokenService : ITokenService
         {
             throw new RefreshTokenBadRequest();
         }
-        // _logger.LogInfo($"Refreshing token for user: {refreshToken.User.Id}");
+        // _logger.LogInfo($"Refreshing token for user: {refreshToken.MyUser.Id}");
 
         var newAccessToken = await GenerateAccessToken(refreshToken.User);
 
@@ -80,7 +80,7 @@ public class TokenService : ITokenService
         {
             throw new RefreshTokenBadRequest();
         }
-        // _logger.LogInfo($"Refreshing token for user: {refreshToken.User.Id}");
+        // _logger.LogInfo($"Refreshing token for user: {refreshToken.MyUser.Id}");
 
         var newAccessToken = await GenerateAccessToken(refreshToken.User);
         var newRefreshToken = await GenerateAndSaveRefreshToken(refreshToken.User);
@@ -95,16 +95,16 @@ public class TokenService : ITokenService
         return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
     }
 
-    private async Task<List<Claim>> GetClaimsPayLoad(User user)
+    private async Task<List<Claim>> GetClaimsPayLoad(MyUser user)
     {
         var claims = new List<Claim>{
             new Claim(ClaimTypes.Email, user.Email!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
     };
         var roles = await _userManager.GetRolesAsync(user);
         foreach (var role in roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim(ClaimTypes.Role.ToString(), role));
         }
         return claims;
     }

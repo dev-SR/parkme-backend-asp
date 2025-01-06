@@ -1,14 +1,10 @@
 
 namespace Shared.DTO.Parking;
-public enum VehicleType
-{
-    CAR,
-    MOTORCYCLE,
-    TRUCK
-}
 
-public record ParkingLotSearchFormDto(
+public record ParkingLotFilterFormDto(
     BoundsDto Bounds,
+    // DateTime? StartDate,
+    // DateTime? EndDate,
     List<string> VehicleTypes,
     List<double> PricePerHourRange
 );

@@ -13,7 +13,7 @@ public static class IdentityExtensions
 
     public static IServiceCollection AddIdentityHandlersAndStores(this IServiceCollection services)
     {
-        services.AddIdentity<User, IdentityRole>(o =>
+        services.AddIdentity<MyUser, MyRole>(o =>
         {
             o.Password.RequireDigit = true;
             o.Password.RequireLowercase = false;

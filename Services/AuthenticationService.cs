@@ -12,10 +12,10 @@ internal sealed class AuthenticationService : IAuthenticationService
 
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<MyUser> _userManager;
     private readonly ITokenService _tokenService;
     private readonly IRepositoryManager _repository;
-    public AuthenticationService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, UserManager<User> userManager, ITokenService tokenService)
+    public AuthenticationService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, UserManager<MyUser> userManager, ITokenService tokenService)
     {
         _repository = repository;
         _tokenService = tokenService;
@@ -26,13 +26,20 @@ internal sealed class AuthenticationService : IAuthenticationService
 
     public async Task<IdentityResult> Register(RegistrationRequestDto registerRequestBody)
     {
-        var user = _mapper.Map<User>(registerRequestBody);
-        user.UserName = registerRequestBody.Email; //UserName is required in Identity;email is used as username;
+        var user = _mapper.Map<MyUser>(registerRequestBody);
+        user.UserName = registerRequestBody.Email;
 
         var result = await _userManager.CreateAsync(user, registerRequestBody.Password!);
 
-        if (result.Succeeded)
-            await _userManager.AddToRolesAsync(user, ["User"]);
+        if (!result.Succeeded)
+        {
+            throw new IdentityException(
+                "Failed to register user"
+                , result.Errors);  // Throw this exception to be caught globally
+        }
+
+        await _userManager.AddToRolesAsync(user, new[] { "User" });
+
         return result;
     }
 

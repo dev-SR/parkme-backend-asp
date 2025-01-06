@@ -20,9 +20,9 @@ public class ParkingLotService : IParkingLotService
 
 
     public async Task<IEnumerable<ParkingLotDto>> GetParkingLotsWithinBoundingBox(
-                                            ParkingLotSearchFormDto searchFormData)
+                                            ParkingLotFilterFormDto filterFormData)
     {
-        var parkingLots = await _repository.ParkingLot.GetParkingLotsWithinBoundingBox(searchFormData);
+        var parkingLots = await _repository.ParkingLot.GetParkingLotsWithinBoundingBox(filterFormData);
         return _mapper.Map<IEnumerable<ParkingLotDto>>(parkingLots);
     }
 }

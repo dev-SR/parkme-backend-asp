@@ -14,9 +14,9 @@ public class ParkingLotController : ControllerBase
 
 
     [HttpPost("search")]
-    public async Task<ActionResult<IEnumerable<ParkingLotDto>>> SearchParkingLots([FromBody] ParkingLotSearchFormDto searchFormData)
+    public async Task<ActionResult<IEnumerable<ParkingLotDto>>> SearchParkingLots([FromBody] ParkingLotFilterFormDto filterFormData)
     {
-        var parkingLots = await _service.ParkingLotService.GetParkingLotsWithinBoundingBox(searchFormData);
+        var parkingLots = await _service.ParkingLotService.GetParkingLotsWithinBoundingBox(filterFormData);
         return Ok(parkingLots);
     }
 }

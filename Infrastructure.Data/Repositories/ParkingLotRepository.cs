@@ -12,7 +12,7 @@ public class ParkingLotRepository : RepositoryBase<ParkingLot>, IParkingLotRepos
     public ParkingLotRepository(RepositoryDbContext dbContext) : base(dbContext)
     {
     }
-    public async Task<IEnumerable<ParkingLot>> GetParkingLotsWithinBoundingBox(ParkingLotSearchFormDto searchFormData)
+    public async Task<IEnumerable<ParkingLot>> GetParkingLotsWithinBoundingBox(ParkingLotFilterFormDto filterFormData)
     {
         // Bounding Box Visualization:
         //
@@ -23,12 +23,12 @@ public class ParkingLotRepository : RepositoryBase<ParkingLot>, IParkingLotRepos
         // (SwLat, SwLng) ---------------------- (SwLat, NeLng)
 
         return await FindByCondition((p) =>
-            p.Latitude >= searchFormData.Bounds.SwLat &&
-            p.Latitude <= searchFormData.Bounds.NeLat &&
-            p.Longitude >= searchFormData.Bounds.SwLng &&
-            p.Longitude <= searchFormData.Bounds.NeLng, trackChanges: false)
-                    .MatchesVehicle(searchFormData.VehicleTypes)
-                    .MatchesPrizeRange(searchFormData.PricePerHourRange)
+            p.Latitude >= filterFormData.Bounds.SwLat &&
+            p.Latitude <= filterFormData.Bounds.NeLat &&
+            p.Longitude >= filterFormData.Bounds.SwLng &&
+            p.Longitude <= filterFormData.Bounds.NeLng, trackChanges: false)
+                    .MatchesVehicle(filterFormData.VehicleTypes)
+                    .MatchesPrizeRange(filterFormData.PricePerHourRange)
                     .Include(p => p.ParkingSpaces)
                     .ToListAsync();
     }
