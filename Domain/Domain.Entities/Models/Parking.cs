@@ -37,13 +37,9 @@ public class Booking
 {
     public Guid Id { get; set; }
 
-    public required double PricePerHour { get; set; }
-    public required double TotalPrice { get; set; }
     public required string VehicleNumber { get; set; }
     public string? PhoneNumber { get; set; }
-    public required string Passcode { get; set; }
-    public required BookingStatus Status { get; set; } = BookingStatus.PENDING;
-    public string? StripePaymentSessionId { get; set; }
+    public required double PricePerHour { get; set; }
     public required DateTime StartDate { get; set; }
     [CustomValidation(typeof(Booking), "ValidateEndDate")]
     public required DateTime EndDate { get; set; }
@@ -52,8 +48,15 @@ public class Booking
     public virtual MyUser User { get; set; } = null!;
     public Guid ParkingSpaceId { get; set; }
     public virtual ParkingSpace ParkingSpace { get; set; } = null!;
-    public virtual ICollection<TimeLine> TimeLines { get; set; } = null!;
 
+
+    public required double TotalPrice { get; set; }
+    public required string Passcode { get; set; }
+    public required BookingStatus Status { get; set; } = BookingStatus.PENDING;
+    public string? StripePaymentSessionId { get; set; }
+
+
+    public virtual ICollection<TimeLine> TimeLines { get; set; } = null!;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

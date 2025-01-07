@@ -14,7 +14,7 @@ public class ParkingSpaceRepository : RepositoryBase<ParkingSpace>, IParkingSpac
 
     public async Task<ParkingSpace?> GetParkingSpaceById(Guid id)
     {
-        return await FindByCondition(space => space.Id == id, trackChanges: false).FirstOrDefaultAsync();
+        return await FindByCondition(space => space.Id == id, trackChanges: false).Include(space => space.ParkingLot).FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<ParkingSpaceDto>> GetParkingSpacesForParkingLot(Guid parkingLotId,

@@ -1,6 +1,7 @@
 using System;
 using AutoMapper;
 using Domain.Contracts;
+using Domain.Entities.Models;
 using Services.Contracts;
 using Shared.DTO.Parking;
 
@@ -17,6 +18,11 @@ public class ParkingSpaceService : IParkingSpaceService
         this.repositoryManager = repositoryManager;
         this.logger = logger;
         this.mapper = mapper;
+    }
+
+    public async Task<ParkingSpace?> GetParkingSpaceById(Guid id)
+    {
+        return await repositoryManager.ParkingSpace.GetParkingSpaceById(id);
     }
 
     public async Task<IEnumerable<ParkingSpaceDto>> GetParkingSpacesForParkingLot(

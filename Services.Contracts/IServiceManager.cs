@@ -9,4 +9,5 @@ public interface IServiceManager
     IParkingLotService ParkingLotService { get; }
 
     IParkingSpaceService ParkingSpaceService { get; }
+    IBookingService BookingService { get; }
 }

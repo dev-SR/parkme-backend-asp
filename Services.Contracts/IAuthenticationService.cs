@@ -10,4 +10,5 @@ public interface IAuthenticationService
     Task<IdentityResult> Register(RegistrationRequestDto registerRequestBody);
     Task<LoginResponseDto> Login(LoginRequestDto loginRequestBody);
     Task<UserResponseDto> GetCurrentUser(string userId);
+    Task<bool> _ValidateUser(Guid userId);
 }

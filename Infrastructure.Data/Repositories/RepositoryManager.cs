@@ -9,6 +9,7 @@ public class RepositoryManager : IRepositoryManager
     private readonly Lazy<IRefreshTokenRepository> _refreshTokenRepository;
     private readonly Lazy<IParkingLotRepository> _parkingLotRepository;
     public readonly Lazy<IParkingSpaceRepository> _parkingSpaceRepository;
+    public readonly Lazy<IBookingRepository> _bookingRepository;
 
     public RepositoryManager(RepositoryDbContext dbContext)
     {
@@ -16,10 +17,13 @@ public class RepositoryManager : IRepositoryManager
         _refreshTokenRepository = new Lazy<IRefreshTokenRepository>(() => new RefreshTokenRepository(dbContext));
         _parkingLotRepository = new Lazy<IParkingLotRepository>(() => new ParkingLotRepository(dbContext));
         _parkingSpaceRepository = new Lazy<IParkingSpaceRepository>(() => new ParkingSpaceRepository(dbContext));
+        _bookingRepository = new Lazy<IBookingRepository>(() => new BookingRepository(dbContext, this));//this->repositoryManager it self
+
     }
     public IRefreshTokenRepository RefreshToken => _refreshTokenRepository.Value;
     public IParkingLotRepository ParkingLot => _parkingLotRepository.Value;
     public IParkingSpaceRepository ParkingSpace => _parkingSpaceRepository.Value;
+    public IBookingRepository Booking => _bookingRepository.Value;
 
 
     public async Task SaveAsync() => await _dbContext.SaveChangesAsync();

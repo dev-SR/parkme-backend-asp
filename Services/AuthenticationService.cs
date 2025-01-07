@@ -72,4 +72,11 @@ internal sealed class AuthenticationService : IAuthenticationService
         var roles = await _userManager.GetRolesAsync(user!);
         return _mapper.Map<UserResponseDto>((user, roles));
     }
+
+
+    public async Task<bool> _ValidateUser(Guid userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString()) ?? throw new UserNotFoundException(userId.ToString());
+        return true;
+    }
 }

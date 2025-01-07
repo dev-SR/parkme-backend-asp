@@ -16,6 +16,8 @@ public sealed class ServiceManager : IServiceManager
 
     private readonly Lazy<IParkingSpaceService> _parkingSpaceService;
 
+    private readonly Lazy<IBookingService> _bookingService;
+
     public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper, UserManager<MyUser> userManager, IConfiguration configuration)
     {
 
@@ -25,6 +27,8 @@ public sealed class ServiceManager : IServiceManager
         _parkingLotService = new Lazy<IParkingLotService>(() => new ParkingLotService(repositoryManager, logger, mapper));
 
         _parkingSpaceService = new Lazy<IParkingSpaceService>(() => new ParkingSpaceService(repositoryManager, logger, mapper));
+
+        _bookingService = new Lazy<IBookingService>(() => new BookingService(repositoryManager, logger, mapper, this));
     }
 
     public IAuthenticationService AuthenticationService => _authenticationService.Value;
@@ -33,4 +37,6 @@ public sealed class ServiceManager : IServiceManager
     public ITokenService TokenService => _tokenService.Value;
 
     public IParkingSpaceService ParkingSpaceService => _parkingSpaceService.Value;
+
+    public IBookingService BookingService => _bookingService.Value;
 }

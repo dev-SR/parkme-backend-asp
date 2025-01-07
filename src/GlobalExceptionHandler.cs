@@ -1,5 +1,6 @@
 using Domain.Entities.ErrorModel;
 using Domain.Entities.Exceptions;
+using Entities.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Services.Contracts;
 
@@ -73,6 +74,8 @@ namespace src
                 InvalidOperationException => StatusCodes.Status400BadRequest,
                 ArgumentException => StatusCodes.Status400BadRequest,
                 UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+                BadRequestException => StatusCodes.Status400BadRequest,//my
+                NotFoundException => StatusCodes.Status404NotFound,//my
                 IdentityException => StatusCodes.Status400BadRequest, // Identity errors treated as BadRequest
                 _ => StatusCodes.Status500InternalServerError // Default for unhandled exceptions
             };
