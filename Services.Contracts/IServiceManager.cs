@@ -10,4 +10,6 @@ public interface IServiceManager
 
     IParkingSpaceService ParkingSpaceService { get; }
     IBookingService BookingService { get; }
+
+    ITestDbService TestDbService { get; }
 }

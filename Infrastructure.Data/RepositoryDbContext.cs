@@ -22,6 +22,10 @@ public class RepositoryDbContext(DbContextOptions options) : IdentityDbContext<M
         modelBuilder.ApplyConfiguration(new ParkingSpaceConfiguration());
         modelBuilder.ApplyConfiguration(new BookingsConfiguration());
 
+
+        // DATA SEEDING
+        modelBuilder.Entity<TestDB>().HasData(SeedTestDb.generateSeedData());
+
         //http://bboxfinder.com/#0.000000,0.000000,0.000000,0.000000
         var kushtiaBoundingBox = new BoundingBox(
             swLng: 89.095284,
@@ -74,5 +78,7 @@ public class RepositoryDbContext(DbContextOptions options) : IdentityDbContext<M
 
     public required DbSet<Booking> Bookings { get; set; }
     public required DbSet<TimeLine> TimeLines { get; set; }
+
+    public required DbSet<TestDB> TestDBs { get; set; }
 
 }

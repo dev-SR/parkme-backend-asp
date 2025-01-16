@@ -6,5 +6,7 @@ public interface IRepositoryManager
     IParkingSpaceRepository ParkingSpace { get; }
 
     IBookingRepository Booking { get; }
+
+    ITestDbRepository TestDb { get; }
     Task SaveAsync();
 }

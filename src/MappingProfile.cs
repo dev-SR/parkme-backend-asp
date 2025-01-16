@@ -2,6 +2,7 @@ using AutoMapper;
 using Domain.Entities.Models;
 using Shared.DTO.Auth;
 using Shared.DTO.Parking;
+using Shared.DTO.Test;
 
 namespace src;
 
@@ -31,5 +32,9 @@ public class MappingProfile : Profile
         // .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => src.VehicleType.ToString()));
 
         CreateMap<ParkingLot, ParkingLotDto>();
+
+        CreateMap<TestDBCreate, TestDB>();
+        CreateMap<TestDB, TesDbRecord>();
+
     }
 }

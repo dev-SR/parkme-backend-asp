@@ -1,17 +1,16 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
+using Shared.DTO.Test;
 
 namespace Presentation.Controllers;
 [Route("api/Test")]
 [ApiController]
-public class TestController : ControllerBase
+public class TestController(ILoggerManager logger, IServiceManager service) : ControllerBase
 {
-    private readonly ILoggerManager _logger;
-    public TestController(ILoggerManager logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILoggerManager _logger = logger;
+    private readonly IServiceManager _service = service;
 
     [HttpGet("logger")]
     public IActionResult Get()
@@ -33,5 +32,21 @@ public class TestController : ControllerBase
             Success = true,
         });
     }
+
+    [HttpGet("test-db")]
+    public async Task<ActionResult<IEnumerable<TesDbRecord>>> TestDbGetAll()
+    {
+        var res = await _service.TestDbService.GetAllTestDBsAsync();
+        return Ok(res);
+    }
+
+    [HttpPost("test-db")]
+    public async Task<IActionResult> TestDbCreate([FromBody] TestDBCreate testDb)
+    {
+        await _service.TestDbService.CreateTestDB(testDb);
+        return Ok();
+    }
+
+
 }
 
